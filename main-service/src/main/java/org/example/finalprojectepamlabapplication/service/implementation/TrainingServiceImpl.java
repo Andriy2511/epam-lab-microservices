@@ -10,6 +10,7 @@ import org.example.finalprojectepamlabapplication.model.Training;
 import org.example.finalprojectepamlabapplication.service.TrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
+    @Transactional
     public TrainingDTO addTraining(TrainingDTO trainingDTO) {
         Training training = TrainingDTO.toEntity(trainingDTO);
         trainingDTO = TrainingDTO.toDTO(trainingRepository.save(training));
@@ -72,6 +74,7 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
+    @Transactional
     public void deleteTrainingById(Long id) {
         TrainingDTO trainingDTO = getTrainingById(id);
         trainingRepository.deleteById(id);
