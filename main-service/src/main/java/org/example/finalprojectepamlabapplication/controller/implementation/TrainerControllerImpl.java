@@ -5,7 +5,6 @@ import org.example.finalprojectepamlabapplication.DTO.endpointDTO.TrainingMonthS
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainerDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingTypeDTO;
-import org.example.finalprojectepamlabapplication.client.TrainerWorkloadClient;
 import org.example.finalprojectepamlabapplication.controller.TrainerController;
 import org.example.finalprojectepamlabapplication.service.TrainerService;
 import org.example.finalprojectepamlabapplication.service.TrainingService;
@@ -26,7 +25,7 @@ public class TrainerControllerImpl implements TrainerController {
     private final TrainingService trainingService;
 
     @Autowired
-    public TrainerControllerImpl(TrainerService trainerService, TrainingTypeService trainingTypeService, TrainingService trainingService, TrainerWorkloadClient trainerWorkloadClient) {
+    public TrainerControllerImpl(TrainerService trainerService, TrainingTypeService trainingTypeService, TrainingService trainingService) {
         this.trainerService = trainerService;
         this.trainingTypeService = trainingTypeService;
         this.trainingService = trainingService;

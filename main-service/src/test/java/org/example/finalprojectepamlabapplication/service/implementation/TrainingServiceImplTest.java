@@ -2,16 +2,24 @@ package org.example.finalprojectepamlabapplication.service.implementation;
 
 import org.example.finalprojectepamlabapplication.DTO.endpointDTO.ActionType;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.*;
-import org.example.finalprojectepamlabapplication.client.TrainerWorkloadClient;
-import org.example.finalprojectepamlabapplication.model.*;
+import org.example.finalprojectepamlabapplication.messenger.TrainerWorkloadMessengerProducer;
+import org.example.finalprojectepamlabapplication.model.Training;
+import org.example.finalprojectepamlabapplication.model.TrainingType;
 import org.example.finalprojectepamlabapplication.repository.TrainingRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import java.util.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 public class TrainingServiceImplTest {
 
@@ -19,7 +27,7 @@ public class TrainingServiceImplTest {
     private TrainingRepository trainingRepository;
 
     @Mock
-    private TrainerWorkloadClient trainerWorkloadClient;
+    private TrainerWorkloadMessengerProducer massagerProducer;
 
     @InjectMocks
     private TrainingServiceImpl trainingService;
@@ -43,7 +51,7 @@ public class TrainingServiceImplTest {
     @Test
     public void testAddTraining() {
         when(trainingRepository.save(any(Training.class))).thenReturn(TrainingDTO.toEntity(trainingDTO));
-        doNothing().when(trainerWorkloadClient).updateTrainerWorkload(trainingDTO, ActionType.ADD);
+        doNothing().when(massagerProducer).sendUpdateTrainerWorkload(trainingDTO, ActionType.ADD);
 
         TrainingDTO result = trainingService.addTraining(trainingDTO);
 
