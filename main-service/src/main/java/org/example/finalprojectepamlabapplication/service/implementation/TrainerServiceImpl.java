@@ -5,7 +5,7 @@ import org.example.finalprojectepamlabapplication.DTO.endpointDTO.TrainingMonthS
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainerDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingTypeDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.UserDTO;
-import org.example.finalprojectepamlabapplication.client.TrainerWorkloadClient;
+import org.example.finalprojectepamlabapplication.messager.TrainerWorkloadMassagerClient;
 import org.example.finalprojectepamlabapplication.repository.TrainerRepository;
 import org.example.finalprojectepamlabapplication.model.Trainer;
 import org.example.finalprojectepamlabapplication.model.User;
@@ -23,13 +23,13 @@ public class TrainerServiceImpl implements TrainerService {
 
     private final TrainerRepository trainerRepository;
     private final UserService userService;
-    private final TrainerWorkloadClient trainerWorkloadClient;
+    private final TrainerWorkloadMassagerClient massagerClient;
 
     @Autowired
-    public TrainerServiceImpl(TrainerRepository trainerRepository, UserService userService, TrainerWorkloadClient trainerWorkloadClient) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository, UserService userService, TrainerWorkloadMassagerClient massagerClient) {
         this.trainerRepository = trainerRepository;
         this.userService = userService;
-        this.trainerWorkloadClient = trainerWorkloadClient;
+        this.massagerClient = massagerClient;
     }
 
     @Override
@@ -78,6 +78,6 @@ public class TrainerServiceImpl implements TrainerService {
 
     @Override
     public TrainingMonthSummaryResponseDTO getTrainerWorkload(Long id, int year, int month){
-        return trainerWorkloadClient.getMonthSummary(id, year, month);
+        return massagerClient.getTrainingWorkload(id, year, month);
     }
 }

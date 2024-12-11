@@ -1,19 +1,25 @@
 package org.example.trainerworkloadservice.DTO;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.example.trainerworkloadservice.enums.ActionType;
 import org.example.trainerworkloadservice.model.TrainerWorkload;
 
 import java.util.Date;
 
+@JsonTypeName("TrainerWorkloadRequestDTO")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_type")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class TrainerWorkloadRequestDTO {
     private Long trainerId;
 
