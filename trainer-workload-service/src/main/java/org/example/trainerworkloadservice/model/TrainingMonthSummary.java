@@ -1,8 +1,7 @@
 package org.example.trainerworkloadservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Getter
 @Setter
@@ -10,20 +9,10 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Entity
-@Table(name = "training_month_summaries")
 public class TrainingMonthSummary {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Field("monthNumber")
     private int monthNumber;
-    private int totalDuration;
 
-    @ManyToOne
-    @JoinColumn(name = "training_year_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonIgnore
-    private TrainingYear trainingYear;
+    @Field("totalDuration")
+    private int totalDuration;
 }

@@ -3,7 +3,6 @@ package org.example.trainerworkloadservice.errorhandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -32,6 +31,17 @@ public class RestResponseEntityExceptionHandlerTest {
 
         String response = exceptionHandler.handleEntityNotFoundException(exception);
         String expectedResponse = expectedResult(errorMessage, HttpStatus.NOT_FOUND);
+
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    public void testHandleIllegalArgumentException() {
+        String errorMessage = "Entity not found";
+        IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
+
+        String response = exceptionHandler.handleIllegalArgumentException(exception);
+        String expectedResponse = expectedResult(errorMessage, HttpStatus.BAD_REQUEST);
 
         assertEquals(expectedResponse, response);
     }

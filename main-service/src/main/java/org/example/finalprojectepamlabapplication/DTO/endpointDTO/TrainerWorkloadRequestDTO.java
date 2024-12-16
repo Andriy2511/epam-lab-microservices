@@ -1,12 +1,17 @@
 package org.example.finalprojectepamlabapplication.DTO.endpointDTO;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.*;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingDTO;
 
 import java.util.Date;
 
+@JsonTypeName("TrainerWorkloadRequestDTO")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_type")
 @Getter
 @Builder(toBuilder = true)
+@ToString
 public class TrainerWorkloadRequestDTO {
     private Long trainerId;
 

@@ -3,7 +3,7 @@ package org.example.finalprojectepamlabapplication.service.implementation;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalprojectepamlabapplication.DTO.endpointDTO.ActionType;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingDTO;
-import org.example.finalprojectepamlabapplication.client.TrainerWorkloadClient;
+import org.example.finalprojectepamlabapplication.messenger.TrainerWorkloadMessengerProducer;
 import org.example.finalprojectepamlabapplication.model.TrainingType;
 import org.example.finalprojectepamlabapplication.repository.TrainingRepository;
 import org.example.finalprojectepamlabapplication.model.Training;
@@ -21,12 +21,12 @@ import java.util.Optional;
 public class TrainingServiceImpl implements TrainingService {
 
     private final TrainingRepository trainingRepository;
-    private final TrainerWorkloadClient trainerWorkloadClient;
+    private final TrainerWorkloadMessengerProducer massagerProducer;
 
     @Autowired
-    public TrainingServiceImpl(TrainingRepository trainingRepository, TrainerWorkloadClient trainerWorkloadClient) {
+    public TrainingServiceImpl(TrainingRepository trainingRepository, TrainerWorkloadMessengerProducer massagerProducer) {
         this.trainingRepository = trainingRepository;
-        this.trainerWorkloadClient = trainerWorkloadClient;
+        this.massagerProducer = massagerProducer;
     }
 
     @Override
@@ -35,14 +35,13 @@ public class TrainingServiceImpl implements TrainingService {
         Training training = TrainingDTO.toEntity(trainingDTO);
         trainingDTO = TrainingDTO.toDTO(trainingRepository.save(training));
 
-        trainerWorkloadClient.updateTrainerWorkload(trainingDTO, ActionType.ADD);
+        massagerProducer.sendUpdateTrainerWorkload(trainingDTO, ActionType.ADD);
 
         return trainingDTO;
     }
 
     @Override
     public TrainingDTO getTrainingById(Long id) {
-        log.info("Searching training with id: {}", id);
         Optional<Training> training = trainingRepository.findById(id);
         if (training.isEmpty()){
             log.warn("Training with id {} not found.", id);
@@ -78,6 +77,6 @@ public class TrainingServiceImpl implements TrainingService {
     public void deleteTrainingById(Long id) {
         TrainingDTO trainingDTO = getTrainingById(id);
         trainingRepository.deleteById(id);
-        trainerWorkloadClient.updateTrainerWorkload(trainingDTO, ActionType.DELETE);
+        massagerProducer.sendUpdateTrainerWorkload(trainingDTO, ActionType.DELETE);
     }
 }
