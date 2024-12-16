@@ -36,6 +36,12 @@ public class RestResponseEntityExceptionHandler {
         return errorDetailsBuilder.toString();
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public String handleIllegalArgumentException(IllegalArgumentException e) {
+        errorDetailsBuilder = new StringBuilder();
+        return buildStringWithErrorDetailsAndStatus(errorDetailsBuilder, HttpStatus.BAD_REQUEST, e);
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     public String handleEntityNotFoundException(ConstraintViolationException e) {
         errorDetailsBuilder = new StringBuilder();

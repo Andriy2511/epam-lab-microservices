@@ -1,7 +1,9 @@
 package org.example.trainerworkloadservice.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
@@ -11,13 +13,13 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Entity
-@Table(name = "trainers")
+@Document(collection = "trainer_workloads")
 public class TrainerWorkload {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
+    private String id;
+
+    @Indexed(unique = true)
     private Long trainerId;
     private String username;
     private String firstName;
@@ -25,6 +27,5 @@ public class TrainerWorkload {
     private boolean isActive;
 
     @EqualsAndHashCode.Exclude
-    @OneToMany(mappedBy = "trainerWorkload", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TrainingYear> trainingYears;
 }

@@ -76,7 +76,6 @@ public class TrainerWorkloadConsumerTest {
 
     private TrainingMonthSummary initializeTrainingMonthSummary(){
         TrainingMonthSummary trainingMonthSummary = new TrainingMonthSummary();
-        trainingMonthSummary.setId(1L);
         trainingMonthSummary.setMonthNumber(1);
         trainingMonthSummary.setTotalDuration(60);
         return trainingMonthSummary;

@@ -72,7 +72,6 @@ class TrainerWorkloadRequestDTOTest {
                 ActionType.ADD
         );
 
-        // Перевіряємо, що виникла помилка валідації для firstName
         Set<ConstraintViolation<TrainerWorkloadRequestDTO>> violations = validator.validate(dto);
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("First name cannot be blank")));
@@ -80,7 +79,6 @@ class TrainerWorkloadRequestDTOTest {
 
     @Test
     void testInvalidLastNameBlank() {
-        // Некоректний об'єкт: lastName порожній
         TrainerWorkloadRequestDTO dto = new TrainerWorkloadRequestDTO(
                 1L,
                 "testuser",

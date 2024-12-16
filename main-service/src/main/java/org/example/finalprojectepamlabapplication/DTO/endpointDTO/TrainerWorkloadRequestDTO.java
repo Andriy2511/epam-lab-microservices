@@ -11,6 +11,7 @@ import java.util.Date;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_type")
 @Getter
 @Builder(toBuilder = true)
+@ToString
 public class TrainerWorkloadRequestDTO {
     private Long trainerId;
 

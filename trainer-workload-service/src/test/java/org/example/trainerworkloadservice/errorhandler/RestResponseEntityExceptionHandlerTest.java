@@ -36,6 +36,17 @@ public class RestResponseEntityExceptionHandlerTest {
     }
 
     @Test
+    public void testHandleIllegalArgumentException() {
+        String errorMessage = "Entity not found";
+        IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
+
+        String response = exceptionHandler.handleIllegalArgumentException(exception);
+        String expectedResponse = expectedResult(errorMessage, HttpStatus.BAD_REQUEST);
+
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
     public void testHandleValidationException() {
         BindingResult bindingResult = mock(BindingResult.class);
         MethodParameter methodParameter = mock(MethodParameter.class);
