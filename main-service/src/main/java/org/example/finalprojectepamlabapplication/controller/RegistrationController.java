@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface RegistrationController {
     @PostMapping("/trainer")
-    void registerTrainer(@RequestBody TrainerDTO trainerDTO);
+    TrainerDTO registerTrainer(@RequestBody TrainerDTO trainerDTO);
 
     @PostMapping("/trainee")
-    void registerTrainee(@RequestBody TraineeDTO traineeDTO);
+    TraineeDTO registerTrainee(@RequestBody TraineeDTO traineeDTO);
 }

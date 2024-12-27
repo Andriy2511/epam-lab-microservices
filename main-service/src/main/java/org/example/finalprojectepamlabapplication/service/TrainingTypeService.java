@@ -8,4 +8,8 @@ public interface TrainingTypeService {
     TrainingTypeDTO getTrainingTypeByName(String name);
 
     List<TrainingTypeDTO> getAllTrainingTypes();
+
+    TrainingTypeDTO addNewTrainingTypeByName(String name);
+
+    TrainingTypeDTO getOrCreateTrainingTypeByName(String name);
 }

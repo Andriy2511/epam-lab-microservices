@@ -18,4 +18,6 @@ public interface TraineeService {
     TraineeDTO updateTrainersListByTraineeId(List<TrainerDTO> trainerDTOList, Long traineeId);
 
     TraineeDTO getTraineeByUserId(Long userId);
+
+    TraineeDTO getTraineeByUserUsername(String username);
 }

@@ -11,6 +11,7 @@ import org.example.finalprojectepamlabapplication.model.User;
 import org.example.finalprojectepamlabapplication.service.TraineeService;
 import org.example.finalprojectepamlabapplication.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,19 +23,29 @@ public class TraineeServiceImpl implements TraineeService {
 
     private final TraineeRepository traineeRepository;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public TraineeServiceImpl(TraineeRepository traineeRepository, UserService userService) {
+    public TraineeServiceImpl(TraineeRepository traineeRepository, UserService userService, PasswordEncoder passwordEncoder) {
         this.traineeRepository = traineeRepository;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public TraineeDTO addTrainee(TraineeDTO traineeDTO) {
+        String rawPassword = traineeDTO.getUserDTO().getPassword();
         Trainee trainee = TraineeDTO.toEntity(traineeDTO);
+
         User user = userService.setUsernameAndPasswordForUser(trainee.getUser());
+        user.setPassword(passwordEncoder.encode(rawPassword));
+
         trainee.setUser(user);
-        return TraineeDTO.toDTO(traineeRepository.save(trainee));
+        trainee = traineeRepository.save(trainee);
+
+        trainee.getUser().setPassword(rawPassword);
+
+        return buildTraineeDTOWithRawPassword(trainee);
     }
 
     @Override
@@ -74,5 +85,21 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeDTO getTraineeByUserId(Long userId) {
         UserDTO userDTO = userService.getUserById(userId);
         return userDTO.getTraineeDTO();
+    }
+
+    @Override
+    public TraineeDTO getTraineeByUserUsername(String username) {
+        UserDTO userDTO = userService.getUserByUsername(username);
+        return userDTO.getTraineeDTO();
+    }
+
+    private TraineeDTO buildTraineeDTOWithRawPassword(Trainee trainee) {
+        TraineeDTO traineeDTO = TraineeDTO.toDTO(trainee);
+        String rawPassword = trainee.getUser().getPassword();
+        return traineeDTO.toBuilder()
+                .userDTO(traineeDTO.getUserDTO().toBuilder()
+                        .password(rawPassword)
+                        .build())
+                .build();
     }
 }

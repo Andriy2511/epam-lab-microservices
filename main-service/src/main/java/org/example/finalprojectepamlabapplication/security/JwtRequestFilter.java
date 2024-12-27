@@ -8,10 +8,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalprojectepamlabapplication.service.BlackListService;
+import org.example.finalprojectepamlabapplication.service.UserDetailsLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,11 +23,13 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
     private final BlackListService blackListService;
+    private final UserDetailsLoader userDetailsLoader;
 
     @Autowired
-    public JwtRequestFilter(JwtTokenProvider jwtTokenProvider, BlackListService blackListService) {
+    public JwtRequestFilter(JwtTokenProvider jwtTokenProvider, BlackListService blackListService, UserDetailsLoader userDetailsLoader) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.blackListService = blackListService;
+        this.userDetailsLoader = userDetailsLoader;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-        setAuthenticationForUser(username, jwtToken);
+        setAuthenticationForUser(username);
         filterChain.doFilter(request, response);
     }
 
@@ -60,20 +63,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, message);
     }
 
-    private void setAuthenticationForUser(String username, String jwtToken){
+    private void setAuthenticationForUser(String username){
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsLoader.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(
-                            username,
+                            userDetails,
                             null,
-                            jwtTokenProvider.getRolesFromToken(jwtToken)
-                                    .stream()
-                                    .map(SimpleGrantedAuthority::new)
-                                    .toList()
+                            userDetails.getAuthorities()
                     );
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
     }
+
 
     private void handleJwtException(HttpServletResponse response, Exception e) throws IOException {
         String message = e instanceof ExpiredJwtException ? "Expired or invalid JWT token" : "The JWT token is invalid";

@@ -33,11 +33,11 @@ public class User {
     @Column(nullable = false)
     private boolean isActive;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     @ToString.Exclude
     private Trainee trainee;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     @ToString.Exclude
     private Trainer trainer;
 }

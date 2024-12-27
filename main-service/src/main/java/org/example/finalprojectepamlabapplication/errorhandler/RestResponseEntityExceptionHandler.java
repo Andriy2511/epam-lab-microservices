@@ -7,6 +7,7 @@ import org.example.finalprojectepamlabapplication.exception.UserAlreadyExistsExc
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jms.JmsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,6 +63,12 @@ public class RestResponseEntityExceptionHandler {
     public String handleTrainerWorkloadException(Exception e) {
         errorDetailsBuilder = new StringBuilder();
         return buildStringWithErrorDetailsAndStatus(errorDetailsBuilder, HttpStatus.BAD_REQUEST, e);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public String handleUsernameNotFoundException(Exception e) {
+        errorDetailsBuilder = new StringBuilder();
+        return buildStringWithErrorDetailsAndStatus(errorDetailsBuilder, HttpStatus.UNAUTHORIZED, e);
     }
 
     @ExceptionHandler(TrainerWorkloadTimeoutException.class)

@@ -6,8 +6,10 @@ import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainerDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingTypeDTO;
 import org.example.finalprojectepamlabapplication.controller.TraineeController;
+import org.example.finalprojectepamlabapplication.security.GumUserDetails;
 import org.example.finalprojectepamlabapplication.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -40,55 +42,61 @@ public class TraineeControllerImpl implements TraineeController {
     }
 
     @Override
-    @PutMapping("/{id}")
-    public TraineeDTO updateTrainee(@PathVariable Long id, TraineeDTO traineeDTO) {
-        Long traineeId = getTraineeIdByUserId(id);
+    @GetMapping
+    public TraineeDTO getTrainee(@AuthenticationPrincipal GumUserDetails userDetails){
+        return traineeService.getTraineeByUserUsername(userDetails.getUsername());
+    }
+
+    @Override
+    @PutMapping
+    public TraineeDTO updateTrainee(@AuthenticationPrincipal GumUserDetails userDetails, TraineeDTO traineeDTO) {
+        Long traineeId = getTraineeIdByUser(userDetails);
         traineeDTO.toBuilder().id(traineeId).build();
         return traineeService.updateTrainee(traineeDTO);
     }
 
     @Override
-    @DeleteMapping("/{id}")
-    public void deleteTrainee(@PathVariable Long id) {
-        Long traineeId = getTraineeIdByUserId(id);
+    @DeleteMapping
+    public void deleteTrainee(@AuthenticationPrincipal GumUserDetails userDetails) {
+        Long traineeId = getTraineeIdByUser(userDetails);
         traineeService.deleteTrainee(traineeId);
     }
 
     @Override
-    @GetMapping("/{id}/not-assigned-trainers")
-    public List<TrainerDTO> getTrainersNotAssignedToTrainee(@PathVariable Long id) {
-        Long traineeId = getTraineeIdByUserId(id);
+    @GetMapping("/not-assigned-trainers")
+    public List<TrainerDTO> getTrainersNotAssignedToTrainee(@AuthenticationPrincipal GumUserDetails userDetails) {
+        Long traineeId = getTraineeIdByUser(userDetails);
         return trainerService.getTrainersNotAssignedToTrainee(traineeId);
     }
 
     @Override
-    @PutMapping("/{id}/trainers")
-    public List<TrainerInfoDTO> updateTraineeTrainersList(@PathVariable Long id, @ModelAttribute("trainersUsername") List<String> trainerUsernames) {
+    @PutMapping("/trainers")
+    public List<TrainerInfoDTO> updateTraineeTrainersList(@AuthenticationPrincipal GumUserDetails userDetails, @ModelAttribute("trainersUsername") List<String> trainerUsernames) {
         List<TrainerDTO> updatedTrainersList = new ArrayList<>();
         for (String trainerUsername : trainerUsernames) {
             updatedTrainersList.add(userService.getUserByUsername(trainerUsername).getTrainerDTO());
         }
 
-        Long traineeId = getTraineeIdByUserId(id);
+        Long traineeId = getTraineeIdByUser(userDetails);
         traineeService.updateTrainersListByTraineeId(updatedTrainersList, traineeId);
 
         return updatedTrainersList.stream().map(TrainerInfoDTO::toTrainerInfoDTO).toList();
     }
 
     @Override
-    @GetMapping("/{id}/trainings")
-    public List<TrainingDTO> getTrainingByTraineeWithCriterion(@PathVariable Long id,
-                                                                               @RequestParam(name = "to-date", required = false) Date toDate,
-                                                                               @RequestParam(name = "from-date", required = false) Date fromDate,
-                                                                               @RequestParam(name = "training-type-name", required = false) String trainingTypeName,
-                                                                               @RequestParam(name = "trainer-username", required = false) String trainerUsername) {
+    @GetMapping("/trainings")
+    public List<TrainingDTO> getTrainingByTraineeWithCriterion(@AuthenticationPrincipal GumUserDetails userDetails,
+                                                               @RequestParam(name = "to-date", required = false) Date toDate,
+                                                               @RequestParam(name = "from-date", required = false) Date fromDate,
+                                                               @RequestParam(name = "training-type-name", required = false) String trainingTypeName,
+                                                               @RequestParam(name = "trainer-username", required = false) String trainerUsername) {
         TrainingTypeDTO trainingTypeDTO = trainingTypeService.getTrainingTypeByName(trainingTypeName);
 
         return trainingService
-                .getTrainingsByTraineeAndCriterion(id, toDate, fromDate, TrainingTypeDTO.toEntity(trainingTypeDTO), trainerUsername);
+                .getTrainingsByTraineeAndCriterion(userService.getUserByUsername(userDetails.getUsername()).getId(), toDate, fromDate, TrainingTypeDTO.toEntity(trainingTypeDTO), trainerUsername);
     }
 
-    private Long getTraineeIdByUserId(Long userId){
-        return traineeService.getTraineeByUserId(userId).getId();
+    private Long getTraineeIdByUser(GumUserDetails userDetails){
+        return traineeService.getTraineeByUserUsername(userDetails.getUsername()).getId();
     }
 }

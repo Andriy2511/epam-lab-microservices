@@ -9,11 +9,13 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class AddTrainingRequestDTO {
 
     @NotBlank(message = "Trainer id is required")

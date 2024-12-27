@@ -12,6 +12,7 @@ import org.example.finalprojectepamlabapplication.model.User;
 import org.example.finalprojectepamlabapplication.service.TrainerService;
 import org.example.finalprojectepamlabapplication.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,20 +25,30 @@ public class TrainerServiceImpl implements TrainerService {
     private final TrainerRepository trainerRepository;
     private final UserService userService;
     private final TrainerWorkloadMessengerClient messengerClient;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public TrainerServiceImpl(TrainerRepository trainerRepository, UserService userService, TrainerWorkloadMessengerClient messengerClient) {
+    public TrainerServiceImpl(TrainerRepository trainerRepository, UserService userService, TrainerWorkloadMessengerClient messengerClient, PasswordEncoder passwordEncoder) {
         this.trainerRepository = trainerRepository;
         this.userService = userService;
         this.messengerClient = messengerClient;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public TrainerDTO addTrainer(TrainerDTO trainerDTO) {
+        String rawPassword = trainerDTO.getUserDTO().getPassword();
         Trainer trainer = TrainerDTO.toEntity(trainerDTO);
+
         User user = userService.setUsernameAndPasswordForUser(trainer.getUser());
+        user.setPassword(passwordEncoder.encode(rawPassword));
+
         trainer.setUser(user);
-        return TrainerDTO.toDTO(trainerRepository.save(trainer));
+        trainer = trainerRepository.save(trainer);
+
+        trainer.getUser().setPassword(rawPassword);
+
+        return buildTrainerDTOWithRawPassword(trainer);
     }
 
     @Override
@@ -73,11 +84,29 @@ public class TrainerServiceImpl implements TrainerService {
     @Override
     public TrainerDTO getTrainerByUserId(Long userId){
         UserDTO userDTO = userService.getUserById(userId);
+
+        return userDTO.getTrainerDTO();
+    }
+
+
+    @Override
+    public TrainerDTO getTrainerByUsername(String username){
+        UserDTO userDTO = userService.getUserByUsername(username);
         return userDTO.getTrainerDTO();
     }
 
     @Override
     public TrainingMonthSummaryResponseDTO getTrainerWorkload(Long id, int year, int month){
         return messengerClient.getTrainingWorkload(id, year, month);
+    }
+
+    private TrainerDTO buildTrainerDTOWithRawPassword(Trainer trainer) {
+        TrainerDTO trainerDTO = TrainerDTO.toDTO(trainer);
+        String rawPassword = trainer.getUser().getPassword();
+        return trainerDTO.toBuilder()
+                .userDTO(trainerDTO.getUserDTO().toBuilder()
+                        .password(rawPassword)
+                        .build())
+                .build();
     }
 }

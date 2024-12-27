@@ -3,7 +3,6 @@ package org.example.trainerworkloadservice.consumer;
 import org.example.trainerworkloadservice.DTO.GetTrainerWorkloadRequestDTO;
 import org.example.trainerworkloadservice.DTO.TrainerWorkloadRequestDTO;
 import org.example.trainerworkloadservice.enums.ActionType;
-import org.example.trainerworkloadservice.filter.TransactionLoggingFilter;
 import org.example.trainerworkloadservice.model.TrainingMonthSummary;
 import org.example.trainerworkloadservice.service.TrainerWorkloadService;
 import org.example.trainerworkloadservice.service.TrainingMonthSummaryService;
@@ -13,7 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

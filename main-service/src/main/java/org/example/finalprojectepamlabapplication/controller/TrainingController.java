@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface TrainingController {
 
     @Operation(summary = "Adds training for the user",
-            description = "The method adds training for the user by user ID and training details")
+            description = "The method adds training for the trainer by trainee username and training details")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Training added successfully"),
             @ApiResponse(responseCode = "400", description = "Trainee, trainer or training type not found")
     })
-    void addTraining(@PathVariable Long id, @ModelAttribute("trainingDTO") AddTrainingRequestDTO addTrainingRequestDTO);
+    void addTraining(@PathVariable String traineeUsername, @ModelAttribute("trainingDTO") AddTrainingRequestDTO addTrainingRequestDTO);
 
     @DeleteMapping
     void cancelTraining(@PathVariable Long id);

@@ -1,7 +1,6 @@
 package org.example.trainerworkloadservice.service.implementation;
 
 import org.example.trainerworkloadservice.model.TrainingMonthSummary;
-import org.example.trainerworkloadservice.model.TrainingYear;
 import org.example.trainerworkloadservice.repository.TrainingMonthSummaryCustomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TrainingMonthSummaryServiceImplTest {

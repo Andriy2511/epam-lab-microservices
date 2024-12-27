@@ -8,7 +8,7 @@ import org.example.finalprojectepamlabapplication.controller.LoginController;
 import org.example.finalprojectepamlabapplication.exception.UnauthorizedException;
 import org.example.finalprojectepamlabapplication.security.JwtTokenProvider;
 import org.example.finalprojectepamlabapplication.service.LoginAttemptService;
-import org.example.finalprojectepamlabapplication.service.implementation.UserServiceImpl;
+import org.example.finalprojectepamlabapplication.service.UserDetailsLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,17 +20,17 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/login")
 public class LoginControllerImpl implements LoginController {
-    private final UserServiceImpl userService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final LoginAttemptService loginAttemptService;
+    private final UserDetailsLoader userDetailsLoader;
 
     @Autowired
-    public LoginControllerImpl(UserServiceImpl userService, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, LoginAttemptService loginAttemptService) {
-        this.userService = userService;
+    public LoginControllerImpl(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager, LoginAttemptService loginAttemptService, UserDetailsLoader userDetailsLoader) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
         this.loginAttemptService = loginAttemptService;
+        this.userDetailsLoader = userDetailsLoader;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class LoginControllerImpl implements LoginController {
             throw new UnauthorizedException("Invalid username or password");
         }
 
-        UserDetails userDetails = userService.loadUserByUsername(loginRequestDTO.getUsername());
+        UserDetails userDetails = userDetailsLoader.loadUserByUsername(loginRequestDTO.getUsername());
         String token = jwtTokenProvider.generateToken(userDetails);
         return new JwtTokenDTO(token);
     }

@@ -3,7 +3,6 @@ package org.example.finalprojectepamlabapplication.service.implementation;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.UserDTO;
 import org.example.finalprojectepamlabapplication.model.User;
 import org.example.finalprojectepamlabapplication.repository.UserRepository;
-import org.example.finalprojectepamlabapplication.utility.PasswordGenerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

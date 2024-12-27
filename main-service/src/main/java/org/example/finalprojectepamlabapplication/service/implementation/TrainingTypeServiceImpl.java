@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -29,5 +30,21 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
     @Override
     public List<TrainingTypeDTO> getAllTrainingTypes() {
         return trainingTypeRepository.findAll().stream().map(TrainingTypeDTO::toDTO).toList();
+    }
+
+    @Override
+    public TrainingTypeDTO addNewTrainingTypeByName(String name) {
+        TrainingType newTrainingType = new TrainingType();
+        newTrainingType.setTrainingTypeName(name);
+        return TrainingTypeDTO.toDTO(trainingTypeRepository.save(newTrainingType));
+    }
+
+    @Override
+    public TrainingTypeDTO getOrCreateTrainingTypeByName(String name){
+        try {
+            return getTrainingTypeByName(name);
+        } catch (NoSuchElementException e) {
+            return addNewTrainingTypeByName(name);
+        }
     }
 }

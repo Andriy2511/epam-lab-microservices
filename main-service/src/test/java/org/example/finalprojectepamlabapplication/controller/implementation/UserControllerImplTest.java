@@ -1,88 +1,108 @@
 package org.example.finalprojectepamlabapplication.controller.implementation;
 
-import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.finalprojectepamlabapplication.DTO.endpointDTO.ChangeLoginRequestDTO;
+import org.example.finalprojectepamlabapplication.DTO.modelDTO.TraineeDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.UserDTO;
 import org.example.finalprojectepamlabapplication.defaulttestdata.dto.DTOBuilder;
 import org.example.finalprojectepamlabapplication.exception.UnauthorizedException;
+import org.example.finalprojectepamlabapplication.model.User;
+import org.example.finalprojectepamlabapplication.security.GumUserDetails;
 import org.example.finalprojectepamlabapplication.service.UserService;
+import org.example.finalprojectepamlabapplication.service.implementation.UserDetailsLoaderImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureMockMvc
 public class UserControllerImplTest {
 
     @Mock
     private UserService userService;
 
+    @Mock
+    private UserDetailsLoaderImpl userDetailsLoader;
+
     @InjectMocks
     private UserControllerImpl userController;
 
     private UserDTO userDTO;
+    private TraineeDTO traineeDTO;
+    private GumUserDetails userDetails;
 
     @BeforeEach
     public void setUp() {
-        RestAssuredMockMvc.standaloneSetup(userController);
+        initializeValues();
+    }
+
+    @Test
+    public void getUserLoginTest() {
+        lenient().when(userService.getUserByUsername(anyString())).thenReturn(userDTO);
+
+        String result = userController.getUserLogin(userDetails);
+
+        assertNotNull(result);
+        assertEquals(userDTO.getUsername(), result);
+    }
+
+    @Test
+    public void changePasswordSuccessTest() {
+        ChangeLoginRequestDTO changeLoginRequestDTO = new ChangeLoginRequestDTO();
+        changeLoginRequestDTO.setOldPassword("oldPass");
+        changeLoginRequestDTO.setNewPassword("newPass");
+
+        when(userService.getUserByUsername(userDTO.getUsername())).thenReturn(userDTO);
+        when(userService.isOldPasswordSimilarToCurrentPassword(1L, "oldPass")).thenReturn(true);
+
+        userController.changePassword(userDetails, changeLoginRequestDTO);
+
+        verify(userService, times(1)).updateUserPassword(userDTO, "newPass");
+    }
+
+    @Test
+    public void changePasswordFailureTest() {
+        ChangeLoginRequestDTO changeLoginRequestDTO = new ChangeLoginRequestDTO();
+        changeLoginRequestDTO.setOldPassword("wrongPass");
+        changeLoginRequestDTO.setNewPassword("newPass");
+
+        when(userService.getUserByUsername(userDTO.getUsername())).thenReturn(userDTO);
+        when(userService.isOldPasswordSimilarToCurrentPassword(1L, "wrongPass")).thenReturn(false);
+
+        UnauthorizedException exception = assertThrows(
+                UnauthorizedException.class,
+                () -> userController.changePassword(userDetails, changeLoginRequestDTO)
+        );
+
+        assertEquals("The old password is incorrect", exception.getMessage());
+        verify(userService, never()).updateUserPassword(any(), anyString());
+    }
+
+    @Test
+    public void changeStatusTest() {
+        when(userService.getUserByUsername(userDTO.getUsername())).thenReturn(userDTO);
+
+        assertDoesNotThrow(() -> userController.changeStatus(userDetails));
+        verify(userService, times(1)).changeActiveStatus(1L);
+    }
+
+    private void initializeValues(){
         userDTO = DTOBuilder.buildUserDTO(1L);
+        traineeDTO = DTOBuilder.buildTraineeDTO(1L, userDTO);
+        userDTO.toBuilder().traineeDTO(traineeDTO).build();
+        initializeUserDetails();
     }
 
-    @Test
-    public void getUserLoginTest(){
-        when(userService.getUserById(1L)).thenReturn(userDTO);
-
-        given()
-                .when()
-                    .get("/users/1")
-                .then()
-                    .statusCode(200)
-                    .body(equalTo(userDTO.getUsername()));
-    }
-
-    @Test
-    public void testChangePasswordSuccessful() {
-        String oldPassword = "0123456789";
-        String newPassword = "1234567890";
-
-        userDTO.toBuilder().password(oldPassword);
-        when(userService.getUserById(1L)).thenReturn(userDTO);
-        when(userService.isOldPasswordSimilarToCurrentPassword(anyLong(), anyString())).thenReturn(true);
-
-        given()
-                .formParam("newPassword", newPassword)
-                .formParam("oldPassword", oldPassword)
-                .when()
-                    .put("/users/1")
-                .then()
-                    .statusCode(200);
-    }
-
-    @Test
-    public void testChangePasswordUnauthorized() {
-        String oldPassword = "0123456789";
-        String newPassword = "1234567890";
-
-        userDTO.toBuilder().password(oldPassword);
-        lenient().when(userService.getUserById(1L)).thenReturn(userDTO);
-
-        assertThrows(UnauthorizedException.class, () -> {
-            userController.changePassword(1L, new ChangeLoginRequestDTO("qwertyuiop", newPassword));
-        });
-    }
-
-    @Test
-    public void changeStatusTest(){
-        given().when().patch("/users/1").then().statusCode(200);
+    private void initializeUserDetails(){
+        User user = UserDTO.toEntity(traineeDTO.getUserDTO());
+        user.setTrainee(TraineeDTO.toEntity(traineeDTO));
+        userDetails = new GumUserDetails(user);
     }
 }

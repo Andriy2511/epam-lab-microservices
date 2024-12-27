@@ -30,12 +30,12 @@ public class TrainingControllerImpl implements TrainingController {
     }
 
     @Override
-    @PostMapping("/{id}")
-    public void addTraining(@PathVariable Long id, @ModelAttribute("trainingDTO") AddTrainingRequestDTO addTrainingRequestDTO) {
-
-        TraineeDTO traineeDTO = traineeService.getTraineeByUserId(id);
-        TrainerDTO trainerDTO = trainerService.getTrainerById(userService.getUserByUsername(addTrainingRequestDTO.getTrainerUsername()).getId());
-        TrainingTypeDTO trainingTypeDTO = trainingTypeService.getTrainingTypeByName(addTrainingRequestDTO.getTrainingTypeName());
+    @PostMapping("/{traineeUsername}")
+    @ResponseBody
+    public void addTraining(@PathVariable String traineeUsername, @ModelAttribute("trainingDTO") AddTrainingRequestDTO addTrainingRequestDTO) {
+        TraineeDTO traineeDTO = traineeService.getTraineeByUserUsername(traineeUsername);
+        TrainerDTO trainerDTO = trainerService.getTrainerByUserId(userService.getUserByUsername(addTrainingRequestDTO.getTrainerUsername()).getId());
+        TrainingTypeDTO trainingTypeDTO = trainingTypeService.getOrCreateTrainingTypeByName(addTrainingRequestDTO.getTrainingTypeName());
 
         TrainingDTO trainingDTO = TrainingDTO.builder()
                 .trainee(traineeDTO)

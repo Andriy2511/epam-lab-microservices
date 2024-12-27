@@ -63,10 +63,10 @@ public class TrainingControllerImplTest {
 
     @Test
     public void addTrainingTest(){
-        when(traineeService.getTraineeByUserId(anyLong())).thenReturn(traineeDTO);
+        lenient().when(traineeService.getTraineeByUserId(anyLong())).thenReturn(traineeDTO);
         when(userService.getUserByUsername(anyString())).thenReturn(secondUserDTO);
-        when(trainerService.getTrainerById(anyLong())).thenReturn(trainerDTO);
-        when(trainingTypeService.getTrainingTypeByName(anyString())).thenReturn(trainingTypeDTO);
+        lenient().when(trainerService.getTrainerById(anyLong())).thenReturn(trainerDTO);
+        lenient().when(trainingTypeService.getTrainingTypeByName(anyString())).thenReturn(trainingTypeDTO);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = dateFormat.format(new Date());

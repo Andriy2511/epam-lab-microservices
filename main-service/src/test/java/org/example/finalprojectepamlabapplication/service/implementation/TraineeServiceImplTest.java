@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -31,6 +32,9 @@ public class TraineeServiceImplTest {
 
     @Mock
     private UserServiceImpl userService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private TraineeServiceImpl traineeService;
@@ -56,6 +60,8 @@ public class TraineeServiceImplTest {
     public void testAddTrainee() {
         when(userService.getAllUsers()).thenReturn(List.of());
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
+        when(passwordEncoder.encode(anyString())).thenReturn(traineeDTO.getUserDTO().getPassword());
+        when(userService.setUsernameAndPasswordForUser(any())).thenReturn(UserDTO.toEntity(traineeDTO.getUserDTO()));
 
         TraineeDTO result = traineeService.addTrainee(traineeDTO);
 
@@ -69,6 +75,8 @@ public class TraineeServiceImplTest {
         when(traineeRepository.findById(anyLong())).thenReturn(Optional.of(trainee));
         when(userService.updateUser(any(UserDTO.class))).thenReturn(traineeDTO.getUserDTO());
         when(traineeRepository.save(any(Trainee.class))).thenReturn(trainee);
+        when(passwordEncoder.encode(anyString())).thenReturn(traineeDTO.getUserDTO().getPassword());
+        when(userService.setUsernameAndPasswordForUser(any())).thenReturn(UserDTO.toEntity(traineeDTO.getUserDTO()));
 
         traineeService.addTrainee(traineeDTO);
 

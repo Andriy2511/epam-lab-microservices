@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: developer
+    active: test
   cloud:
     loadbalancer:
       ribbon:
@@ -15,12 +15,6 @@ spring:
     template:
       default-destination: 604800000
       receive-timeout: 5000
-
-messaging:
-  queues:
-    trainerWorkload: trainer-workload-queue
-    getTrainerWorkloadRequest: get-trainer-workload-queue-request
-    getTrainerWorkloadResponse: get-trainer-workload-queue-response
 
 springdoc:
   swagger-ui:
@@ -47,7 +41,6 @@ resilience4j:
         slidingWindowSize: 10
         failureRateThreshold: 50
         waitDurationInOpenState: 5000ms
-
 ---
 spring:
   config:
@@ -86,6 +79,12 @@ management:
     diskspace:
       enabled: false
 
+messaging:
+  queues:
+    trainerWorkload: trainer-workload-queue
+    getTrainerWorkloadRequest: get-trainer-workload-queue-request
+    getTrainerWorkloadResponse: get-trainer-workload-queue-response
+
 ---
 spring:
   config:
@@ -98,7 +97,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
     driverClassName: org.h2.Driver
     username: sa
     password: password
@@ -123,3 +122,9 @@ management:
       enabled: false
     diskspace:
       enabled: false
+
+messaging:
+  queues:
+    trainerWorkload: test-trainer-workload-queue
+    getTrainerWorkloadRequest: test-get-trainer-workload-queue-request
+    getTrainerWorkloadResponse: test-get-trainer-workload-queue-response

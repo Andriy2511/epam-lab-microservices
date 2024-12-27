@@ -1,7 +1,9 @@
 package org.example.finalprojectepamlabapplication.DTO.modelDTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.example.finalprojectepamlabapplication.model.User;
 
 @Getter
@@ -21,6 +23,7 @@ public class UserDTO {
 
     private String password;
 
+    @JsonProperty("active")
     private boolean isActive;
 
     private TraineeDTO traineeDTO;

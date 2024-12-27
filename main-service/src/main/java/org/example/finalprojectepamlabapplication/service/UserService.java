@@ -2,6 +2,7 @@ package org.example.finalprojectepamlabapplication.service;
 
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.UserDTO;
 import org.example.finalprojectepamlabapplication.model.User;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 

@@ -19,5 +19,7 @@ public interface TrainerService {
 
     TrainerDTO getTrainerByUserId(Long userId);
 
+    TrainerDTO getTrainerByUsername(String username);
+
     TrainingMonthSummaryResponseDTO getTrainerWorkload(Long id, int year, int month);
 }

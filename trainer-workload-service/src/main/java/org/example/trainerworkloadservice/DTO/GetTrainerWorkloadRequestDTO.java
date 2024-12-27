@@ -2,10 +2,7 @@ package org.example.trainerworkloadservice.DTO;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @JsonTypeName("GetTrainerWorkloadRequestDTO")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "_type")
@@ -13,6 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class GetTrainerWorkloadRequestDTO {
     private Long trainerId;
     private int trainingYear;

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TraineeDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainerDTO;
+import org.example.finalprojectepamlabapplication.DTO.modelDTO.UserDTO;
 import org.example.finalprojectepamlabapplication.controller.RegistrationController;
 import org.example.finalprojectepamlabapplication.exception.UserAlreadyExistsException;
 import org.example.finalprojectepamlabapplication.service.TraineeService;
@@ -22,40 +23,22 @@ public class RegistrationControllerImpl implements RegistrationController {
 
     private final TraineeService traineeService;
     private final TrainerService trainerService;
-    private final UserService userService;
 
     @Autowired
-    public RegistrationControllerImpl(TraineeService traineeService, TrainerService trainerService, UserService userService) {
+    public RegistrationControllerImpl(TraineeService traineeService, TrainerService trainerService) {
         this.traineeService = traineeService;
         this.trainerService = trainerService;
-        this.userService = userService;
     }
 
     @Override
     @PostMapping("/trainer")
-    public void registerTrainer(@Valid @RequestBody TrainerDTO trainerDTO){
-        String username = trainerDTO.getUserDTO().getUsername();
-        if(!isUserExists(username)) {
-            trainerService.addTrainer(trainerDTO);
-        }  else {
-            log.debug("The user {} already exists", username);
-            throw new UserAlreadyExistsException("The user already exists");
-        }
+    public TrainerDTO registerTrainer(@Valid @RequestBody TrainerDTO trainerDTO){
+        return trainerService.addTrainer(trainerDTO);
     }
 
     @Override
     @PostMapping("/trainee")
-    public void registerTrainee(@Valid @RequestBody TraineeDTO traineeDTO){
-        String username = traineeDTO.getUserDTO().getUsername();
-        if(!isUserExists(username)) {
-            traineeService.addTrainee(traineeDTO);
-        }  else {
-            log.debug("The user {} already exists", username);
-            throw new UserAlreadyExistsException("The user already exists");
-        }
-    }
-
-    private boolean isUserExists(String username){
-        return userService.getUserByUsername(username) != null;
+    public TraineeDTO registerTrainee(@Valid @RequestBody TraineeDTO traineeDTO){
+        return traineeService.addTrainee(traineeDTO);
     }
 }

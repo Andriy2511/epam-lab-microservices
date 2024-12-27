@@ -6,10 +6,12 @@ import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainerDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingTypeDTO;
 import org.example.finalprojectepamlabapplication.controller.TrainerController;
+import org.example.finalprojectepamlabapplication.security.GumUserDetails;
 import org.example.finalprojectepamlabapplication.service.TrainerService;
 import org.example.finalprojectepamlabapplication.service.TrainingService;
 import org.example.finalprojectepamlabapplication.service.TrainingTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -32,22 +34,22 @@ public class TrainerControllerImpl implements TrainerController {
     }
 
     @Override
-    @GetMapping("/{id}")
-    public TrainerDTO getTrainer(@PathVariable Long id) {
-        return trainerService.getTrainerByUserId(id);
+    @GetMapping
+    public TrainerDTO getTrainer(@AuthenticationPrincipal GumUserDetails userDetails) {
+        return trainerService.getTrainerByUsername(userDetails.getUsername());
     }
 
     @Override
-    @PutMapping("/{id}")
-    public TrainerDTO updateTrainer(@PathVariable Long id, TrainerDTO trainerDTO) {
-        Long trainerId = getTrainerIdByUserId(id);
+    @PutMapping
+    public TrainerDTO updateTrainer(@AuthenticationPrincipal GumUserDetails userDetails, TrainerDTO trainerDTO) {
+        Long trainerId = getTrainerIdByUser(userDetails);
         trainerDTO.toBuilder().id(trainerId).build();
         return trainerService.updateTrainer(trainerDTO);
     }
 
     @Override
-    @GetMapping("/{id}/trainings")
-    public List<TrainingDTO> getTrainingByTrainerWithCriterion(@PathVariable Long id,
+    @GetMapping("/trainings")
+    public List<TrainingDTO> getTrainingByTrainerWithCriterion(@AuthenticationPrincipal GumUserDetails userDetails,
                                                                                @RequestParam(name = "to-date", required = false) Date toDate,
                                                                                @RequestParam(name = "from-date", required = false) Date fromDate,
                                                                                @RequestParam(name = "training-type-name", required = false) String trainingTypeName,
@@ -55,15 +57,17 @@ public class TrainerControllerImpl implements TrainerController {
         TrainingTypeDTO trainingTypeDTO = trainingTypeService.getTrainingTypeByName(trainingTypeName);
 
         return trainingService
-                .getTrainingsByTrainerAndCriterion(id, toDate, fromDate, TrainingTypeDTO.toEntity(trainingTypeDTO), traineeUsername);
+                .getTrainingsByTrainerAndCriterion(getTrainer(userDetails).getUserDTO().getId(), toDate, fromDate, TrainingTypeDTO.toEntity(trainingTypeDTO), traineeUsername);
     }
 
-    @GetMapping("/{id}/workload")
-    public TrainingMonthSummaryResponseDTO getTrainingWorkload(@PathVariable Long id, @RequestParam(name = "year") int year, @RequestParam(name = "month") int month){
-        return trainerService.getTrainerWorkload(getTrainerIdByUserId(id), year, month);
+    @Override
+    @GetMapping("/workload")
+    public TrainingMonthSummaryResponseDTO getTrainingWorkload(@AuthenticationPrincipal GumUserDetails userDetails, @RequestParam(name = "year") int year, @RequestParam(name = "month") int month){
+        String username = userDetails.getUsername();
+        return trainerService.getTrainerWorkload(trainerService.getTrainerByUsername(username).getId(), year, month);
     }
 
-    private Long getTrainerIdByUserId(Long userId){
-        return trainerService.getTrainerByUserId(userId).getId();
+    private Long getTrainerIdByUser(GumUserDetails userDetails){
+        return trainerService.getTrainerByUsername(userDetails.getUsername()).getId();
     }
 }

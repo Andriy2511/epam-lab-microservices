@@ -1,6 +1,5 @@
 package org.example.finalprojectepamlabapplication.service.implementation;
 
-import org.example.finalprojectepamlabapplication.DTO.modelDTO.TraineeDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainerDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.TrainingTypeDTO;
 import org.example.finalprojectepamlabapplication.DTO.modelDTO.UserDTO;
@@ -12,6 +11,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.util.List;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.*;
@@ -24,6 +25,9 @@ public class TrainerServiceImplTest {
 
     @Mock
     private UserServiceImpl userService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private TrainerServiceImpl trainerService;
@@ -47,6 +51,8 @@ public class TrainerServiceImplTest {
     public void testAddTrainer() {
         when(userService.getAllUsers()).thenReturn(List.of());
         when(trainerRepository.save(any(Trainer.class))).thenReturn(trainer);
+        when(passwordEncoder.encode(anyString())).thenReturn(trainerDTO.getUserDTO().getPassword());
+        when(userService.setUsernameAndPasswordForUser(any())).thenReturn(UserDTO.toEntity(trainerDTO.getUserDTO()));
 
         TrainerDTO result = trainerService.addTrainer(trainerDTO);
 
