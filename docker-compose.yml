@@ -1,0 +1,59 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    networks:
+      - gym-network
+    environment:
+      MYSQL_DATABASE: gymdb
+      MYSQL_ROOT_PASSWORD: 12345
+    ports:
+      - "3306:3306"
+
+  activemq:
+    image: rmohr/activemq
+    container_name: activemq
+    networks:
+      - gym-network
+    ports:
+      - "61616:61616"
+      - "8162:8161"
+
+  eureka-app:
+    image: eureka-app
+    container_name: eureka-app
+    depends_on:
+      - mysql
+      - activemq
+    networks:
+      - gym-network
+    ports:
+      - "8761:8761"
+
+  main-app:
+    image: main-app
+    container_name: main-app
+    depends_on:
+      - eureka-app
+      - mysql
+      - activemq
+    networks:
+      - gym-network
+    ports:
+      - "8081:8081"
+
+  report-app:
+    image: report-app
+    container_name: report-app
+    depends_on:
+      - eureka-app
+      - activemq
+    networks:
+      - gym-network
+    ports:
+      - "8082:8082"
+
+networks:
+  gym-network:
+    driver: bridge
+    external: true
